@@ -1,0 +1,144 @@
+import random
+import re
+
+
+# ---------------------------------------------------------------------------
+# here are the globals.  an instance of class Random for undefined parameters,
+# a regular expression for parsing options from parameter strings,
+# and a global value to consistently identify open fields.  
+# --------------------------------------------------------
+
+omn = random.Random()
+option = re.compile("(\[.*\])")
+open_field = 'o'
+parameterPattern = re.compile("([ika])([a-z]*)(?:,([0-9]*(?:.[0-9]*)?))?(?:,(-?[0-9]*(?:.[0-9]*)?))?")
+
+# --------------------------------------------------------------------
+# class Parameter.  this is used to store information specific to each 
+# parameter, such as its maximum rate, the value of its field, and the limits
+# of the range of values it can be.  this can be used to connect an output to 
+# the parameter in the appropriate way.
+# ----------------------------------------------------
+
+class Parameter:
+	def __init__(self, rate="i", field=open_field, range=1.0, offset=0.0):
+		self.rate = rate
+		self.field = field
+		self.range = range
+		self.offset = offset
+	def __repr__(self):
+		return self.field
+	def isOpen(self):
+		return self.field == open_field
+	
+# ---------------------------------------------------------------------------	
+# ParameterList is a collection of Parameters and is mostly used to deal with
+# optional parameters.  specifically, it makes sure that length() returns the
+# length of the actual parameters being used, and not the potentially but not
+# yet used, and that indexing works in the same way.  in order to expand the
+# optional parameters, call expand() and the parameters will unfold one step.
+# ---------------------------------------------------------------------------
+	
+	
+class ParameterList:
+	def __init__(self, param):
+		parse = self.parseOptions(param)
+		self.options = parse[1]
+		self.param = re.split(", ", parse[0])
+		param = []
+		for p in self.param:
+			param.append(Parameter(p[0]))
+		self.param = param
+	def __getitem__(self, index):
+		return self.param[index]
+	def length(self):
+		return len(self.param)
+	def parseOptions(self, string):
+		options = []
+		def parse(st, param=''):
+			if not st:
+				return string, param
+			car = st[0]
+			if car == '[':
+				option = parse(st[1:])
+				options.extend([option[1]])
+				return parse(option[0], param) 
+			elif car == ']':
+				return st[1:], param
+			else:
+				return parse(st[1:], param+st[0])
+		parsed = parse(string)
+		return parsed[1], options
+
+	
+class Opcode:
+	def __init__(self, parameters):
+		parameters = parameters.split('\t')
+		self.outputs = parameters[0]
+		self.name = parameters[1]
+		self.parameters = ParameterList(parameters[2])
+	def __repr__(self):
+		repr = self.outputs+'\t'+self.name+'\t'
+		for p in self.parameters:
+			if p.isOpen():
+				repr += str(omn.random()*p.range+p.offset)
+			else:
+				repr += str(p.field)
+			repr += ", "
+		repr = repr[:-2]
+		return repr
+	def setParameter(self, index, value):
+		self.parameters[index] = value
+	def parameters(self, plist):
+		params = []
+		for i in range(self.parameters.length()):
+			if plist[i] == i:
+				params.append(self.parameters[i])
+		return params
+	def openParameters(self):
+		openp = []
+		for p in self.parameters:
+			if p.isOpen():
+				openp.append(p)
+		return openp
+	def nameParameters(self):
+		names = []
+		for p in self.parameters:
+			if not p.isOpen() and p[0] != 'p':
+				names.append(i)
+		return names
+	def pfieldParameters(self):
+		pfields = []
+		for p in self.parameters:
+			if p[0] == 'p':
+				pfields.append(i)
+		return pfields
+
+		
+class OpcodeFactory:
+	def opcode(self, code):
+		if code == 'oscil':
+			return Opcode("ar\toscil\txamp, xfreq, ifnc[, iphs]")
+		elif code == 'line':
+			return Opcode("ar\tline\tia, idur1, ib")
+		elif code == 'out':
+			return Opcode("\touts\taright, aleft")
+		else:
+			return Opcode("ai\t"+code+"\t")
+
+opcodes = OpcodeFactory()
+
+class Instrument:
+	def __init__(self, number):
+		self.number = number
+		self.names = {"out":opcodes.opcode('out')}
+		self.pfields = 3
+	def __repr__(self):
+		repr = "\tinstr\t"+str(self.number)+"\n"
+	def addName(self, name, line):
+		self.names[name] = opcodes.opcode(name)
+	def getNames(self):
+		self.names.keys()
+	def getUnusedPfield(self):
+		self.pfields += 1
+		return "p"+str(self.pfields)

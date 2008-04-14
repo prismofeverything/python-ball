@@ -1,0 +1,36 @@
+
+class Segment:
+    def __init__(self, low=0.0, high=1.0):
+        self.low = low
+        self.high = high
+
+    def between(self):
+        return self.high - self.low
+
+    def outUnit(self, value):
+        if value < self.low: return self.low
+        elif value > self.high: return self.high
+
+        return (value - self.low) / self.between()
+        
+    def inUnit(self, value):
+        return (value * self.between()) + self.low
+
+class SegmentMap:
+    def __init__(self, red, blue):
+        self.red = red
+        self.blue = blue
+
+    def mapRed(self, redbit):
+        red = self.red.outUnit(redbit)
+        blue = self.blue.inUnit(red)
+
+        return blue
+
+    def mapBlue(self, bluebit):
+        blue = self.blue.outUnit(bluebit)
+        red = self.red.inUnit(blue)
+
+        return red
+
+    

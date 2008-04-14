@@ -1,0 +1,41 @@
+#!/usr/bin/python
+
+import sys,random,os
+args = sys.argv[1:]
+
+def randomdog(dogs):
+	if dogs == []:
+		return "no dogs!"
+	else:
+		random.shuffle(dogs)
+		return dogs[0]
+
+try:
+	dogfile = open('dogfile.bar', 'r')
+except IOError:
+	print "no dogs!"
+	dogfile = open('dogfile.bar', 'w')
+	dogfile.close()
+	os.chmod('dogfile.bar', 0777)
+else:
+	doglist = dogfile.readlines()
+	dogfile.close()
+
+	for i in range(0, len(doglist)):
+		doglist[i] = doglist[i][:-1]
+
+	if args == []:
+		print randomdog(doglist)
+	elif args[0] == '-u':
+		dogstring = raw_input('dog>')
+		if dogstring == '':
+			print randomdog(doglist)
+		else:
+			doglist.append(dogstring);
+			dogfile = open('dogfile.bar', 'w')
+			for dogtext in doglist:
+				dogfile.write(dogtext + "\n")
+			dogfile.close()
+	else:
+		print randomdog(doglist)
+	

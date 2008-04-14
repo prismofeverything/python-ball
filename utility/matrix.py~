@@ -1,0 +1,49 @@
+def exp(prev, terms):
+    return prev + reduce(lambda c, v: c*v, terms, 1.0)
+
+def dot(a, b):
+    return reduce(exp, zip(a, b), 0)
+
+def identity(dim):
+    def i(index):
+        if index % (dim+1) == 0: return 1.0
+        else: return 0.0
+    
+    return vec(*[i(index) for index in range(dim*dim)])
+
+class Matrix:
+    def __init__(self, height, width):
+        self.height = height
+        self.width = width
+
+        self.matrix = [0.0 for row in range(self.height) for width in range(self.width)]]
+
+    def rows(self):
+        rows = []
+        for row in range(self.height):
+            columns = []
+            for column in range(self.width):
+                index = column*self.height + row
+                columns.append(self.matrix[index])
+            rows.append(columns)
+
+    def columns(self):
+        columns = []
+        for column in range(self.width):
+            rows = []
+            for row in range(self.height):
+                index = column*self.height + row
+                rows.append(self.matrix[index])
+            columns.append(rows)
+
+    def __mul__(self, other):
+        result = Matrix(self.height, other.width)
+        index = 0
+        for column in other.columns:
+            for row in self.rows:
+                result.matrix[index] = dot(column, row)
+                index += 1
+
+        return result
+
+

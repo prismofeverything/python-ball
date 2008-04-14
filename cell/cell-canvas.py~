@@ -1,0 +1,15 @@
+#!/usr/bin/python
+
+from Tkinter import *
+
+class CellCanvas:
+    def __init__(self, width, height, rows, columns):
+        self.width = width
+        self.height = height
+        self.rows = rows
+        self.columns = columns
+        self.canvas = Canvas(width = self.width, height = self.height)
+        self.canvas.pack()
+        self.unit_width = (width // columns)
+        self.unit_height = (height // rows)
+        self.cell_grid = CellGrid(rows, columns, 

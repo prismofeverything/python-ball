@@ -1,0 +1,10 @@
+import note
+import scale
+import keyorgan
+
+Ratio = scale.Ratio
+Scale = scale.Scale
+ScaleGenerator = scale.ScaleGenerator
+Note = note.Note
+notetree = note.test
+KeyOrgan = keyorgan.KeyOrgan

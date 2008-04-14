@@ -1,0 +1,59 @@
+import sys
+import math
+import music
+import sound
+import interface
+
+class IOrgan(interface.Gram):
+
+    def __init__(self, scale, basefreq, rect=(0.0, 0.0, 1.0, 1.0)):
+        interface.Gram.__init__(self, rect)
+
+        self.scale = scale
+        self.basefreq = basefreq
+        self.keyorder = [49, 113, 97, 122,
+                         50, 119, 115, 120,
+                         51, 101, 100, 99,
+                         52, 114, 102, 118,
+                         53, 116, 103, 98,
+                         54, 121, 104, 110,
+                         55, 117, 106, 109,
+                         56, 105, 107, 44,
+                         57, 111, 108, 46,
+                         48, 112, 59, 47,
+                         45, 91, 39]
+        self.down = {}
+
+    def orderOf(self, key):
+        try:
+            tone = self.keyorder.index(key)
+        except ValueError:
+            tone = None
+        return tone
+
+    def keydown(self, key):
+        tone = self.orderOf(key)
+        freq = self.scale.toneToFreq(tone, self.basefreq)
+        gain = 0.8
+        tone = self.getSound().sendToneOn(key, freq, gain)
+
+        self.down[key] = tone
+        print "down: " + str(key) + " at " + str(freq)
+
+    def keyup(self, key):
+        if self.down.has_key(key):
+            self.getSound().sendToneOff(key)
+            self.down[key].off()
+            self.down[key] = None
+
+            print "up: " + str(key)
+
+def test():
+    hl = music.ScaleGenerator()
+    mn = (0.1, 0.1, 0.9, 0.9)
+    ug = IOrgan(hl.worthy(), 200.0, mn)
+    ak = interface.Interface((400, 500))
+    ak.addGram(ug)
+
+    return ak
+                        

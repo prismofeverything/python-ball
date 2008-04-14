@@ -1,0 +1,50 @@
+import time
+
+def timefunc(func, times=1):
+    before = time.time()
+
+    for x in range(times):
+        func()
+
+    after = time.time()
+
+    return after - before
+        
+
+def frombyte(bytes):
+    message = ''
+
+    lobytes = bytes.split(' ')
+    for sobytes in lobytes:
+        power = 7
+        char = 0
+
+        for bit in sobytes:
+            if bit == '1':
+                char += 2 ** power
+
+            power -= 1
+
+        message += chr(char)
+
+    return message
+
+def tobyte(message):
+    lobytes = []
+
+    for char in message:
+        number = ord(char)
+        sobytes = ''
+
+        for power in range(7, -1, -1):
+            binarydigit = 2 ** power
+            if binarydigit <= number:
+                number -= binarydigit
+                sobytes += '1'
+            else:
+                sobytes += '0'
+
+        lobytes.append(sobytes)
+
+    return ' '.join(lobytes)
+

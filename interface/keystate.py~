@@ -1,0 +1,40 @@
+#!/usr/bin/python
+
+import pygame
+
+pygame.init()
+
+class KeyState:
+
+	def __init__(self):
+		self.keys_down = [0 for x in range(256)]
+		self.listeners = []
+
+	def addListener(self, listener):
+		self.listeners.append(listener)
+
+	def removeListener(self, listener):
+		self.listeners.remove(listener)
+
+	def sendKeyDown(self, event):
+		self.keys_down[event.key] = 1
+		
+		for listener in listeners:
+			listener.keyDown(event, self)
+
+	def sendKeyUp(self, event):
+		self.keys_down[event.key] = 0
+		
+		for listener in listeners:
+			listener.keyUp(event, self.keys_down)
+
+	def wait(self):
+		while 1:
+			event = pygame.event.wait()
+			
+			if event.type == pygame.QUIT:
+				quit()
+			elif event.type == pygame.KEYDOWN:
+				self.sendKeyDown(event)
+			elif event.type == pygame.KEYUP:
+				self.sendKeyUp(event)
