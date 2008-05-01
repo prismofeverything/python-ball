@@ -406,36 +406,53 @@ class Timer:
             self.clock = 0.0
             self.func()
 
+class InterfaceListener:
+    def __init__(self):
+
+
+class InterfaceGlontrol(Glontrol):
+    def __init__(self):
+        Glontrol.__init__(self, 'interface')
+
+        self.listeners = {}
+        self.mouseDown = False
+
+        for key in ['close',
+                    'update',
+                    'key_press',
+                    'key_release',
+                    'mouse_press',
+                    'mouse_release',
+                    'mouse_motion',
+                    'mouse_drag']:
+            self.listeners[key] = []
+
+    def send(self, listener, *signal):
+        for receptor in self.listeners[listener]:
+            receptor.signal(listener, signal)
+
+    def on_close(self): self.send('close')
+    def on_update(self, dt): self.send('update', dt)
+    def on_key_press(self, sym, mods): self.send('key_press', sym, mods)
+    def on_key_release(self, sym, mods): self.send('key_release', sym, mods)
+    def on_mouse_press(self, x, y, b, mods): self.send('mouse_press', x, y, b, mods)
+    def on_mouse_release(self, dt): self.send('mouse_release', )
+    def on_mouse_motion(self, dt): self.send('mouse_motion', [dt])
+    def on_mouse_drag(self, dt): self.send('mouse_drag', [dt])
 
 class Interface(Gram):
     def __init__(self, dimension, framerate=40, controlrate=0.2):
         Gram.__init__(self, (0, 0, dimension[0], dimension[1]))
 
-#         pygame.init()
-#         self.surface = pygame.display.set_mode(dimension)
-#         self.font = pygame.font.Font(None, 25)
-
         self.initializeGl()
 
         self.grams = []
-        self.listeners = {}
 
         self.runclock = 0.0
         self.framerate = framerate
         self.previousTick = time.time()
 
-        self.mouseDown = False
         self.sound = sound.Sound()
-
-        for key in ['quit',
-                    'timer',
-                    'keydown',
-                    'keyup',
-                    'mousedown',
-                    'mouseup',
-                    'mousemotion',
-                    'mousedrag']:
-            self.listeners[key] = []
 
     def initializeGl(self):
         self.ww = Glindow()

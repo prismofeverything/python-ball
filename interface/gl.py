@@ -94,9 +94,14 @@ class Glorld:
             glob.draw(dt)
 
 class Glontrol:
-    def __init__(self, name, parent=None):
+    def __init__(self, name, glindow=None, parent=None):
         self.name = name
-        self.w = None
+
+        self.w = glindow
+        if self.w != None:
+            self.w.push_handlers(self)
+            self.w.glontrol = self
+
         self.parent = parent
         self.children = []
 
