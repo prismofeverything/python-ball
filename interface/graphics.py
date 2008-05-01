@@ -256,8 +256,8 @@ class Gram(Box):
         else:
             return self.parentgram.getSound()
 
-    def getTimer(self, rate, func):
-        return self.parentgram.getTimer(rate, func)
+    def makeTimer(self, rate, func):
+        return self.parentgram.makeTimer(rate, func)
 
     def getDraws(self, full=False):
         return []
@@ -390,56 +390,6 @@ class Gram(Box):
         
 
 
-class Timer:
-    def __init__(self, rate, func):
-        self.rate = rate
-        self.func = func
-        self.clock = 0.0
-        self.before = time.time()
-
-    def __call__(self, elapsed):
-        self.forward(elapsed)
-
-    def forward(self, elapsed):
-        self.clock += elapsed
-        if self.clock > self.rate:
-            self.clock = 0.0
-            self.func()
-
-class InterfaceListener:
-    def __init__(self):
-
-
-class InterfaceGlontrol(Glontrol):
-    def __init__(self):
-        Glontrol.__init__(self, 'interface')
-
-        self.listeners = {}
-        self.mouseDown = False
-
-        for key in ['close',
-                    'update',
-                    'key_press',
-                    'key_release',
-                    'mouse_press',
-                    'mouse_release',
-                    'mouse_motion',
-                    'mouse_drag']:
-            self.listeners[key] = []
-
-    def send(self, listener, *signal):
-        for receptor in self.listeners[listener]:
-            receptor.signal(listener, signal)
-
-    def on_close(self): self.send('close')
-    def on_update(self, dt): self.send('update', dt)
-    def on_key_press(self, sym, mods): self.send('key_press', sym, mods)
-    def on_key_release(self, sym, mods): self.send('key_release', sym, mods)
-    def on_mouse_press(self, x, y, b, mods): self.send('mouse_press', x, y, b, mods)
-    def on_mouse_release(self, dt): self.send('mouse_release', )
-    def on_mouse_motion(self, dt): self.send('mouse_motion', [dt])
-    def on_mouse_drag(self, dt): self.send('mouse_drag', [dt])
-
 class Interface(Gram):
     def __init__(self, dimension, framerate=40, controlrate=0.2):
         Gram.__init__(self, (0, 0, dimension[0], dimension[1]))
@@ -487,7 +437,7 @@ class Interface(Gram):
     def getSound(self):
         return self.sound
 
-    def getTimer(self, rate, func):
+    def makeTimer(self, rate, func):
         return self.addTimer(rate, func)
 
     def makeRect(self, rect):
@@ -503,86 +453,6 @@ class Interface(Gram):
         textimage = self.font.render(text, True, color.rgba256())
         self.surface.blit(textimage, self.makeRect(rect))
 
-    def update(self, boxes=None):
-        pygame.display.update(boxes)
-
-    def getEvent(self):
-        return pygame.event.get()
-
-    def getMods(self):
-        return pygame.key.get_mods()
-
-    def tick(self, delay):
-        pygame.time.delay(delay)
-
-    def broadcast(self, channel, message):
-		for listener in self.listeners[channel]:
-			listener(message)
-
-    def addListener(self, channel, listener):
-        self.listeners[channel].append(listener)
-
-    def addTimer(self, rate, func):
-        timer = Timer(rate, func)
-        self.listeners['timer'].append(timer)
-
-        return timer
-
-    def eventLoop(self):
-        self.previousTick = time.time()
-
-        while 1:
-            mousemotion = []
-            mousedrag = []
-
-            for event in getEvent():
-                if event.type == QUIT:
-                    self.broadcast('quit', None)
-                    return
-
-                elif event.type == KEYDOWN:
-                    if self.keydown(event.key) == "quit":
-                        return
-
-                elif event.type == KEYUP:
-                    self.keyup(event.key)
-
-                elif event.type == MOUSEBUTTONDOWN:
-                    self.mouseDown = True
-
-                    pos = self.toUnit(event.pos)
-                    self.mousedown(pos)
-
-                elif event.type == MOUSEBUTTONUP:
-                    self.mouseDown = False
-
-                    pos = self.toUnit(event.pos)
-                    self.mouseup(pos)
-
-                elif event.type == MOUSEMOTION:
-                    pos = self.toUnit(event.pos)
-
-                    if self.mouseDown:
-                        mousedrag.append(pos)
-                    else:
-                        mousemotion.append(pos)
-
-            if len(mousemotion):
-                self.broadcast("mousemotion", mousemotion)
-            if len(mousedrag):
-                self.broadcast("mousedrag", mousedrag)
-
-            now = time.time()
-            elapsed = now - self.previousTick
-            self.previousTick = now
-
-            self.broadcast("timer", elapsed)
-
-            self.tick(self.framerate)
-
     def start(self):
-        self.eventLoop()
+        self.w.start()
 
-    def quit(self):
-        pygame.display.quit()
-        pygame.quit()

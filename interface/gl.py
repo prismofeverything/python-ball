@@ -3,6 +3,7 @@ from math import pi, sin, cos, tan
 from pyglet.gl import *
 from pyglet import clock
 from pyglet import window
+from pyglet import font
 from pyglet.window import key
 
 from utility.matrix import *
@@ -147,6 +148,89 @@ class WindowGlontrol(Glontrol):
         self.w.mods = mods
         if symbol in self.w.keys:
             self.w.keys.remove(symbol)
+
+class GlontTree:
+    def __init__(self):
+        self.families = {}
+
+    def glont(self, family, size):
+        if not self.families.has_key(family):
+            self.families[family] = {}
+        if not self.families[family].has_key(size):
+            self.families[family][size] = font.load(family, size)
+
+        return self.families[family][size]
+
+class Timer:
+    def __init__(self, rate, func):
+        self.rate = rate
+        self.func = func
+        self.clock = 0.0
+        self.before = time.time()
+
+    def __call__(self, elapsed):
+        self.forward(elapsed)
+
+    def forward(self, elapsed):
+        self.clock += elapsed
+        if self.clock > self.rate:
+            self.clock = 0.0
+            self.func()
+
+class Gleceptor:
+    def __init__(self):
+        pass
+
+    def signal(channel, signal):
+        pass
+
+
+class GlobalGlontrol(Glontrol):
+    def __init__(self):
+        Glontrol.__init__(self, 'interface')
+
+        self.receptors = {}
+        self.mouseDown = False
+
+        for key in ['close',
+                    'update',
+                    'timer',
+                    'key_press',
+                    'key_release',
+                    'mouse_press',
+                    'mouse_release',
+                    'mouse_motion',
+                    'mouse_drag']:
+            self.receptors[key] = []
+
+        def update(up, dt): self.send('timer', dt)
+        self.addReceptor('update', update)
+
+    def send(self, channel, *signal):
+        for receptor in self.receptors[key]:
+            receptor.signal(channel, signal)
+
+    def on_close(self): self.send('close')
+    def on_update(self, dt): self.send('update', dt)
+    def on_key_press(self, sym, mods): self.send('key_press', sym, mods)
+    def on_key_release(self, sym, mods): self.send('key_release', sym, mods)
+    def on_mouse_press(self, x, y, b, mods): self.send('mouse_press', x, y, but, mods)
+    def on_mouse_release(self, dt): self.send('mouse_release', x, y, but, mods)
+    def on_mouse_motion(self, dt): self.send('mouse_motion', x, y, dx, dy)
+    def on_mouse_drag(self, dt): self.send('mouse_drag', x, y, dx, dy, but, mods)
+
+    def addReceptor(self, channel, receptor):
+        self.receptors[channel].append(receptor)
+
+    def removeReceptor(self, channel, receptor):
+        self.receptors[channel].remove(receptor)
+
+    def addTimer(self, rate, func):
+        timer = Timer(rate, func)
+        self.receptors['timer'].append(timer)
+
+        return timer
+
 
 class Glindow(window.Window):
     def __init__(self):
