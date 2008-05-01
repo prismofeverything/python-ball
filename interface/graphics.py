@@ -5,12 +5,11 @@ try:
     import math
     import os
     import getopt
-    import pygame
+    import pyglet
     import time
     import utility
     import sound
-
-    from pygame.locals import *
+    from interface.gl import *
 
 except ImportError, err:
     print "couldn't load module:  %s" %(err)
@@ -412,9 +411,11 @@ class Interface(Gram):
     def __init__(self, dimension, framerate=40, controlrate=0.2):
         Gram.__init__(self, (0, 0, dimension[0], dimension[1]))
 
-        pygame.init()
-        self.surface = pygame.display.set_mode(dimension)
-        self.font = pygame.font.Font(None, 25)
+#         pygame.init()
+#         self.surface = pygame.display.set_mode(dimension)
+#         self.font = pygame.font.Font(None, 25)
+
+        self.initializeGl()
 
         self.grams = []
         self.listeners = {}
@@ -435,6 +436,26 @@ class Interface(Gram):
                     'mousemotion',
                     'mousedrag']:
             self.listeners[key] = []
+
+    def initializeGl(self):
+        self.ww = Glindow()
+        self.ww.activeGlye().tz = -8
+
+        self.glye = Glye(rotate_glye)
+        self.glye.tz = -4
+
+        self.glights = [Glight(GL_LIGHT0, vec(.5, .5, 1, 0), vec(.5, .5, 1, 1), vec(1, 1, 1, 1)),
+                        Glight(GL_LIGHT1, vec(1, 0, .5, 0), vec(.5, .5, .5, 1), vec(1, 1, 1, 1))]
+
+        self.glontrol = InterfaceGlontrol()
+
+        self.ww.addGlye(glye)
+        self.ww.glorld.glights = glights
+
+        self.ww.addGlontrol(self.glontrol)
+        self.glontrol.attach(self.ww)
+
+        self.ww.start()
 
     def trigger(self, subdraws):
         boxes = []

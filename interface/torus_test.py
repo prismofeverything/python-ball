@@ -2,7 +2,7 @@ from interface.gl import *
 
 
 def rotate_glye(self, dt):
-    
+    self.shift([dt*1, 0., 0., 0., 0., 0., 0., 0., 0.])
 
 def make_torus(radius, inner_radius, slices, inner_slices):
     def mt():
