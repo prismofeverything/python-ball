@@ -256,7 +256,7 @@ class Gram(Box):
             return self.parentgram.getSound()
 
     def makeTimer(self, rate, func):
-        return self.parentgram.makeTimer(rate, func)
+        return self.parentgram.getTimer(rate, func)
 
     def getDraws(self, full=False):
         return []
@@ -387,7 +387,21 @@ class Gram(Box):
             self.mousedelta = posdiff(pos, self.mousepos)
             self.mousepos = pos
         
+class Timer:
+    def __init__(self, rate, func):
+        self.rate = rate
+        self.func = func
+        self.clock = 0.0
+        self.before = time.time()
 
+    def __call__(self, elapsed):
+        self.forward(elapsed)
+
+    def forward(self, elapsed):
+        self.clock += elapsed
+        if self.clock > self.rate:
+            self.clock = 0.0
+            self.func()
 
 class Interface(Gram):
     def __init__(self, dimension, framerate=40, controlrate=0.2):
@@ -404,6 +418,9 @@ class Interface(Gram):
         self.previousTick = time.time()
 
         self.sound = sound.Sound()
+
+        self.listeners = {}
+        self.mouseDown = false
 
         for key in ['quit',
                     'timer',
@@ -428,8 +445,33 @@ class Interface(Gram):
     def getSound(self):
         return self.sound
 
-    def makeTimer(self, rate, func):
+    def getTimer(self, rate, func):
         return self.addTimer(rate, func)
+
+    def update(self, boxes=None):
+        pygame.display.update(boxes)
+
+    def getEvent(self):
+        return pygame.event.get()
+
+    def getMods(self):
+        return pygame.key.get_mods()
+
+    def tick(self, delay):
+        pygame.time.delay(delay)
+
+    def broadcast(self, channel, message):
+               for listener in self.listeners[channel]:
+                       listener(message)
+
+    def addListener(self, channel, listener):
+        self.listeners[channel].append(listener)
+
+    def addTimer(self, rate, func):
+        timer = Timer(rate, func)
+        self.listeners['timer'].append(timer)
+
+        return timer
 
     def makeRect(self, rect):
         return pygame.Rect(rect[0], rect[1], rect[2], rect[3])
