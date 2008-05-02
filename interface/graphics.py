@@ -5,6 +5,7 @@ try:
     import math
     import os
     import getopt
+    import pygame
     import time
     import utility
     import sound
@@ -443,6 +444,62 @@ class Interface(Gram):
         textimage = self.font.render(text, True, color.rgba256())
         self.surface.blit(textimage, self.makeRect(rect))
 
+    def eventLoop(self):
+        self.previousTick = time.time()
+
+        while 1:
+            mousemotion = []
+            mousedrag = []
+
+            for event in getEvent():
+                if event.type == QUIT:
+                    self.broadcast('quit', None)
+                    return
+
+                elif event.type == KEYDOWN:
+                    if self.keydown(event.key) == "quit":
+                        return
+
+                elif event.type == KEYUP:
+                    self.keyup(event.key)
+
+                elif event.type == MOUSEBUTTONDOWN:
+                    self.mouseDown = True
+
+                    pos = self.toUnit(event.pos)
+                    self.mousedown(pos)
+
+                elif event.type == MOUSEBUTTONUP:
+                    self.mouseDown = False
+
+                    pos = self.toUnit(event.pos)
+                    self.mouseup(pos)
+
+                elif event.type == MOUSEMOTION:
+                    pos = self.toUnit(event.pos)
+
+                    if self.mouseDown:
+                        mousedrag.append(pos)
+                    else:
+                        mousemotion.append(pos)
+
+            if len(mousemotion):
+                self.broadcast("mousemotion", mousemotion)
+            if len(mousedrag):
+                self.broadcast("mousedrag", mousedrag)
+
+            now = time.time()
+            elapsed = now - self.previousTick
+            self.previousTick = now
+
+            self.broadcast("timer", elapsed)
+
+            self.tick(self.framerate)
+
     def start(self):
-        self.w.start()
+        self.eventLoop()
+
+    def quit(self):
+        pygame.display.quit()
+        pygame.quit()
 
