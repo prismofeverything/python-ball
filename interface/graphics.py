@@ -5,7 +5,6 @@ try:
     import math
     import os
     import getopt
-    import pyglet
     import time
     import utility
     import sound
