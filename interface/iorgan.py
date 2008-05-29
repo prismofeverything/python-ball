@@ -164,10 +164,16 @@ class IOrgan(graphics.Gram):
 def test():
     hl = music.ScaleGenerator()
     mn = (0.0, 0.2, 1.0, 1.0)
-    ug = IOrgan(hl.melded(8).symmetrify(), 100.0, mn)
+    ug = IOrgan(hl.otonality(16), 100.0, mn)
     ak = graphics.Interface((1100, 300))
     ak.addGram(ug)
 
     ug.drawRatios()
 
     return ak
+
+
+
+if __name__ == "__main__":
+    ya = test()
+    ya.start()

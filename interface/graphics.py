@@ -10,6 +10,8 @@ try:
     import utility
     import sound
 
+    from pygame.locals import *
+
 except ImportError, err:
     print "couldn't load module:  %s" %(err)
     sys.exit(2)
@@ -420,7 +422,7 @@ class Interface(Gram):
         self.sound = sound.Sound()
 
         self.listeners = {}
-        self.mouseDown = false
+        self.mouseDown = False
 
         for key in ['quit',
                     'timer',
@@ -493,31 +495,31 @@ class Interface(Gram):
             mousemotion = []
             mousedrag = []
 
-            for event in getEvent():
-                if event.type == QUIT:
+            for event in self.getEvent():
+                if event.type == pygame.QUIT:
                     self.broadcast('quit', None)
                     return
 
-                elif event.type == KEYDOWN:
+                elif event.type == pygame.KEYDOWN:
                     if self.keydown(event.key) == "quit":
                         return
 
-                elif event.type == KEYUP:
+                elif event.type == pygame.KEYUP:
                     self.keyup(event.key)
 
-                elif event.type == MOUSEBUTTONDOWN:
+                elif event.type == pygame.MOUSEBUTTONDOWN:
                     self.mouseDown = True
 
                     pos = self.toUnit(event.pos)
                     self.mousedown(pos)
 
-                elif event.type == MOUSEBUTTONUP:
+                elif event.type == pygame.MOUSEBUTTONUP:
                     self.mouseDown = False
 
                     pos = self.toUnit(event.pos)
                     self.mouseup(pos)
 
-                elif event.type == MOUSEMOTION:
+                elif event.type == pygame.MOUSEMOTION:
                     pos = self.toUnit(event.pos)
 
                     if self.mouseDown:
