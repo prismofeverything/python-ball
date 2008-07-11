@@ -95,16 +95,17 @@ class MarkovChain:
 
         return ' '.join(statement)
 
-test_source = [("maybe", "this", "will", "make", "some", "kind", "of", "sense"),
-               ("this", "maybe", "sense", "maybe", "kind", "kind", "sense", "of", "this", "will", "maybe")]
 
+if __name__ == '__main__':
+    test_source = [("maybe", "this", "will", "make", "some", "kind", "of", "sense"),
+                   ("this", "maybe", "sense", "maybe", "kind", "kind", "sense", "of", "this", "will", "maybe")]
 
-def test():
-    jar = open("/home/omnibus/thackdai-herolinian-ardus-implosivus")
-    mik = jar.read()
-    apn = text.parseConversation(mik)
+    def test():
+        jar = open("/home/omnibus/thackdai-herolinian-ardus-implosivus")
+        mik = jar.read()
+        apn = text.parseConversation(mik)
 
-    gaa = MarkovChain()
-    gaa.appendSource(apn)
-    return gaa
+        gaa = MarkovChain()
+        gaa.appendSource(apn)
+        return gaa
 

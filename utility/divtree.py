@@ -42,6 +42,8 @@ class Fract:
 # same total duration, but they would group differently with other notes.
 
 
+# Now that I think about it, is there any reason to store durations separately of how many divisions there are in the parent node?  
+
 
 
 
