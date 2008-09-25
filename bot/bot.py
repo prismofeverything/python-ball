@@ -27,6 +27,9 @@ class Bot:
         self.s = socket.socket()
         self.s.connect((self.host, self.port))
 
+    def generate(self):
+        return ' '.join(self.markov.generate())
+
     def send(self, msg):
         self.s.send(msg+'\n')
 
@@ -50,7 +53,7 @@ class Bot:
                 self.send('PONG '+line[1])
 
     def respond(self, sender, statement):
-        response = 'PRIVMSG '+self.channel+' :'+sender[0]+': '+' '.join(statement)
+        response = 'PRIVMSG ' + self.channel + ' :' + sender[0] + ': ' + statement
         print response
 
         self.send(response)
@@ -62,7 +65,7 @@ class Bot:
         sender = info[0].split('!')
 
         if self.trigger.search(msg) is not None:
-            statement = self.markov.generate()
+            statement = self.generate()
             parts = self.break_msg(statement)
 
             for part in parts:
