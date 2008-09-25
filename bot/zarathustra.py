@@ -8,7 +8,7 @@ import bot
 
 class Zarathustrabot(bot.Bot):
     def __init__(self, channel='#instrument'):
-        bot.Bot.__init__(self, 'Zarathustrabat', 'zarathustra.txt', 'Z', channel)
+        bot.Bot.__init__(self, 'Zarathustrabot', 'zarathustra.txt', 'Z', channel)
 
 if __name__ == "__main__":
     z = Zarathustrabot("#instrument")
