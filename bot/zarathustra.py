@@ -6,10 +6,10 @@ import re
 import text
 import bot
 
-class Zarathustrabot(bot.Bot):
-    def __init__(self, channel='#instrument'):
-        bot.Bot.__init__(self, 'Zarathustrabot', 'zarathustra.txt', 'Z', channel)
+class Zarathustrabot(bot.MarkovBot):
+    def __init__(self):
+        bot.MarkovBot.__init__(self, 'Zarathustrabit', 'zarathustra.txt', 'Z')
 
 if __name__ == "__main__":
-    z = Zarathustrabot("#instrument")
-    z.join()
+    z = Zarathustrabot()
+    z.process()

@@ -5,14 +5,14 @@ body {
 }
 
 #speaks {
-	font-size: 120px;
+	font-size: 88px;
 	color: #eecc22;
-	margin-left: 300px;
+	text-align: center;
 	margin-top: 30px;
 }
 
 #statement {
-	font-size: 44px;
+	font-size: 33px;
 	margin-left: 80px;
 	margin-right: 80px;
 	margin-top: 100px;
