@@ -5,7 +5,6 @@ import re
 
 import text
 
-
 def has(line, msg):
     return line.find(msg) != -1
 
@@ -17,8 +16,8 @@ class Bot:
         self.host = 'irc.freenode.net'
         self.port = 6667
         self.nick = nick
-        self.ident = 'spanglerbot'
-        self.realname = 'spangler'
+        self.ident = 'nietzschebot'
+        self.realname = 'flux'
         self.owner = 'patchwork'
         self.channel = channel
 
@@ -31,11 +30,11 @@ class Bot:
         return ' '.join(self.markov.generate())
 
     def send(self, msg):
-        self.s.send(msg+'\n')
+        self.s.send(msg + '\n')
 
     def join(self):
-        self.send('NICK '+self.nick)
-        self.send('USER '+self.ident+' '+self.host+' bla :'+self.realname)
+        self.send('NICK ' + self.nick)
+        self.send('USER ' + self.ident + ' ' + self.host + ' bla :' + self.realname)
 
         while True:
             line=self.s.recv(500)
@@ -50,11 +49,11 @@ class Bot:
 
             line = line.split()
             if(line[0] == 'PING'):
-                self.send('PONG '+line[1])
+                self.send('PONG ' + line[1])
 
     def respond(self, sender, statement):
         response = 'PRIVMSG ' + self.channel + ' :' + sender[0] + ': ' + statement
-        print response
+        print '<' + self.nick + '> ' +  statement
 
         self.send(response)
 
@@ -69,7 +68,7 @@ class Bot:
             parts = self.break_msg(statement)
 
             for part in parts:
-                self.respond(sender, part)
+                self.respond(sender[0], part)
 
     def break_msg(self, whole):
         if len(whole) > 300:

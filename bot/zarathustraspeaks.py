@@ -2,6 +2,7 @@ import web
 import zarathustra
 
 Z = zarathustra.Zarathustrabot()
+Z.join()
 
 render = web.template.render('templates/',cache=False)
 
