@@ -131,8 +131,20 @@ class MarkovBot(Bot):
 
     def handle_message(self, channel, sender, message):
         if self.trigger.search(message) is not None:
-            if has(statement, "join")
+            if has(message, "join"):
+                try:
+                    new_channel = channel_name.search(message).group(0)
+                    self.join(new_channel)
+                except:
+                    pass
+            if has(message, "leave"):
+                try:
+                    old_channel = channel_name.search(message).group(0)
+                    self.leave(old_channel)
+                except:
+                    pass
+
             statement = self.generate()
-            message = sender + ": " + statement
-            self.send_message(channel, message)
+            reply = sender + ": " + statement
+            self.send_message(channel, reply)
 
