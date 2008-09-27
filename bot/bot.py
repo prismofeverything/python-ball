@@ -43,6 +43,7 @@ class Bot:
     def identify(self):
         self.send('NICK ' + self.nick)
         self.send('USER ' + self.identity + ' ' + self.host + ' bla :' + self.realname)
+        self.send('NICKSERV IDENTIFY ' + self.identity)
 
     def process(self):
         self.processing = True
