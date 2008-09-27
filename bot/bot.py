@@ -11,17 +11,19 @@ def has(line, message):
 channel_name = re.compile("#[^ ]+")
 
 class Bot:
-    def __init__(self, nick):
+    def __init__(self, nick, logging=False):
         self.host = 'irc.freenode.net'
         self.port = 6667
         self.nick = nick
-        self.ident = 'nietzschebot'
+        self.identity = 'nietzschebot'
         self.realname = 'flux'
         self.owner = 'patchwork'
         self.channels = {}
 
         self.connected = False
         self.processing = False
+        self.logging = logging
+        self.logs = {}
 
         self.readbuffer = ''
 
@@ -38,7 +40,7 @@ class Bot:
 
     def identify(self):
         self.send('NICK ' + self.nick)
-        self.send('USER ' + self.ident + ' ' + self.host + ' bla :' + self.realname)
+        self.send('USER ' + self.identity + ' ' + self.host + ' bla :' + self.realname)
 
     def process(self):
         self.processing = True
@@ -59,11 +61,18 @@ class Bot:
                 self.send('PONG ' + parts[1])
             
     def join(self, channel):
+        if self.logging:
+            self.logs[channel] = open('logs/' + channel[1:], 'a')
         self.channels[channel] = True
+
         self.send('JOIN ' + channel)
 
     def leave(self, channel):
+        if self.logging:
+            self.logs[channel].close()
+            del self.logs[channel]
         del self.channels[channel]
+
         self.send('LEAVE ' + channel)
 
     def quit(self):
@@ -75,9 +84,16 @@ class Bot:
 
     def respond(self, channel, message):
         response = 'PRIVMSG ' + channel + ' :' + message
-        print '<' + self.nick + '> ' +  message
 
+        self.log(channel, self.nick, message)
         self.send(response)
+
+    def log(self, channel, sender, message):
+        log = '<' + sender + '> ' +  message
+        print log
+
+        if self.logging:
+            self.logs[channel].write(log + '\n')
 
     def parse_message(self, line):
         complete = line[1:].split(':', 1)
@@ -86,8 +102,7 @@ class Bot:
         sender = info[0].split('!')[0]
         channel = info[2]
 
-        print '<' + sender + '> ' +  message
-
+        self.log(channel, sender, message)
         self.handle_message(channel, sender, message)
 
     def handle_message(self, channel, sender, message):
@@ -120,8 +135,8 @@ class Bot:
 
 
 class MarkovBot(Bot):
-    def __init__(self, nick, source, trigger):
-        Bot.__init__(self, nick)
+    def __init__(self, nick, source, trigger, logging=False):
+        Bot.__init__(self, nick, logging)
 
         self.markov = text.markovBook(source)
         self.trigger = re.compile(trigger)
@@ -137,12 +152,14 @@ class MarkovBot(Bot):
                     self.join(new_channel)
                 except:
                     pass
-            if has(message, "leave"):
+            elif has(message, "leave"):
                 try:
                     old_channel = channel_name.search(message).group(0)
                     self.leave(old_channel)
                 except:
                     pass
+            elif has(message, "quit"):
+                self.quit()
 
             statement = self.generate()
             reply = sender + ": " + statement
