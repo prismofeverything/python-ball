@@ -85,7 +85,7 @@ class Bot:
             del self.logs[channel]
         del self.channels[channel]
 
-        self.send('LEAVE ' + channel)
+        self.send('PART ' + channel)
 
     def quit(self):
         for channel in self.channels.keys:
@@ -187,8 +187,14 @@ class MarkovBot(Bot):
                     self.leave(old_channel)
                 except:
                     pass
+            elif has(message, "topic"):
+                topic_channel = channel
+                try:
+                    topic_channel = channel_name.search(message).group(0)
+                except:
+                    pass
+                self.send("TOPIC " + topic_channel + " " + self.markov.generateN(11))
             elif has(message, "quit"):
                 self.quit()
-
             
 
