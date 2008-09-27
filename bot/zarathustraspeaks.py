@@ -41,7 +41,7 @@ class home:
 class number:
     def GET(self, n):
         web.header('Content-Type', 'text/html')
-        output = render_statement(Z.markov.generateN(n))
+        output = render_statement(Z.markov.generateN(int(n)))
 
         print(output)
 

@@ -89,13 +89,16 @@ class MarkovChain:
 
     def generateN(self, n):
         statement = []
-        node = None
+        node = self.getBeginning()
 
-        for x in range(n):
-            if not node:
-                node = self.getBeginning()
+        for x in range(int(n)):
             statement.append(node.data)
             choice = node.forward()
+
+            if not choice:
+                node = self.getBeginning()
+            else:
+                node = self.nodes[choice]
 
         return ' '.join(statement)
 
