@@ -2,6 +2,7 @@ import sys
 import socket
 import string
 import re
+import math
 
 import text
 
@@ -9,6 +10,7 @@ def has(line, message):
     return line.find(message) != -1
 
 channel_name = re.compile("#[^ ]+")
+non_punctuation = re.compile("[^.,!?]+")
 
 class Bot:
     def __init__(self, nick, logging=False):
@@ -48,8 +50,6 @@ class Bot:
 
         while self.processing:
             line = self.s.recv(500).rstrip()
-
-            print line
 
             if len(self.channels) == 0:
                 self.join("#dog")
@@ -147,8 +147,9 @@ class MarkovBot(Bot):
     def handle_message(self, channel, sender, message):
         frequencies = []
         for word in message.split():
-            if self.markov.has(word):
-                node = self.markov.nodes[word]
+            clean = non_punctuation.search(word).group(0)
+            if self.markov.has(clean):
+                node = self.markov.nodes[clean]
                 frequencies.append([node.data, float(node.occurrences) / self.markov.totalAtoms])
         frequencies.sort(lambda a, b: cmp(a[1], b[1]))
 
@@ -175,11 +176,6 @@ class MarkovBot(Bot):
 
             reply = sender + ": " + statement
             self.send_message(channel, reply)
-        elif len(frequencies) > 0 and frequencies[0][1] < 0.001:
-            print frequencies[0]
 
-            statement = self.markov.expandFrom(frequencies[0][0])
-            reply = sender + ": " + statement
-            self.send_message(channel, reply)
             
 
