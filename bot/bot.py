@@ -97,6 +97,7 @@ class Bot:
 
         if self.logging:
             self.logs[channel].write(log + '\n')
+            self.logs[channel].flush()
 
     def parse_message(self, line):
         complete = line[1:].split(':', 1)
