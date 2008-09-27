@@ -193,7 +193,7 @@ class MarkovBot(Bot):
                     topic_channel = channel_name.search(message).group(0)
                 except:
                     pass
-                self.send("TOPIC " + topic_channel + " " + self.markov.generateN(11))
+                self.send("TOPIC " + topic_channel + " :" + self.markov.generateN(11))
             elif has(message, "quit"):
                 self.quit()
             
