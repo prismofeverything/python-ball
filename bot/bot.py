@@ -167,6 +167,14 @@ class MarkovBot(Bot):
         frequencies.sort(lambda a, b: cmp(a[1], b[1]))
 
         if self.trigger.search(message) is not None:
+            if len(frequencies) > 0:
+                statement = self.markov.expandFrom(frequencies[0][0])
+            else:
+                statement = self.generate()
+
+            reply = sender + ": " + statement
+            self.send_message(channel, reply)
+
             if has(message, "join"):
                 try:
                     new_channel = channel_name.search(message).group(0)
@@ -181,14 +189,6 @@ class MarkovBot(Bot):
                     pass
             elif has(message, "quit"):
                 self.quit()
-
-            if len(frequencies) > 0:
-                statement = self.markov.expandFrom(frequencies[0][0])
-            else:
-                statement = self.generate()
-
-            reply = sender + ": " + statement
-            self.send_message(channel, reply)
 
             
 
