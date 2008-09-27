@@ -51,6 +51,8 @@ class Bot:
         while self.processing:
             line = self.s.recv(500).rstrip()
 
+            print line
+
             if len(self.channels) == 0:
                 self.join("#dog")
             if has(line, 'PRIVMSG'):
