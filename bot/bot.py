@@ -1,4 +1,5 @@
 import sys
+import os
 import socket
 import string
 import re
@@ -29,12 +30,12 @@ class Bot:
 
         self.readbuffer = ''
 
-        self.connect()
-
     def send(self, message):
         self.s.send(message + '\n')
 
     def connect(self):
+        """if used as an IRC bot, you need to open the socket with connect()
+        and then start the loop with process()"""
         self.s = socket.socket()
         self.s.connect((self.host, self.port))
 
@@ -63,9 +64,17 @@ class Bot:
             if len(parts) > 0 and parts[0] == 'PING':
                 self.send('PONG ' + parts[1])
             
+    def open_log(self, path, channel):
+        try:
+            os.makedirs('logs/channels')
+        except:
+            print "already exists"
+
+        self.logs[channel] = open(path + channel[1:], 'a')
+
     def join(self, channel):
         if self.logging:
-            self.logs[channel] = open('logs/' + channel[1:], 'a')
+            self.open_log('logs/channels/', channel)
         self.channels[channel] = True
 
         self.send('JOIN ' + channel)
