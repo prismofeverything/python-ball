@@ -6,13 +6,15 @@ import random
 class MarkovNode:
     def __init__(self, data):
         self.data = data
-        self.following = wheel.Wheel()
+        self.before = wheel.Wheel()
+        self.after = wheel.Wheel()
         self.occurrences = 1
         self.begins = 0
         self.ends = 0
 
     def precede(self, node):
-        self.following.add(node.data, 1)
+        self.after.add(node.data, 1)
+        node.before.add(self.data, 1)
 
     def occur(self):
         self.occurrences += 1
@@ -23,9 +25,17 @@ class MarkovNode:
     def end(self):
         self.ends += 1
         
-    def choose(self):
-        return self.following.spin()
+    def isBeginning(self):
+        return self.begins > 0
 
+    def isEnding(self):
+        return self.ends > 0
+
+    def forward(self):
+        return self.after.spin()
+
+    def backward(self):
+        return self.before.spin()
 
 class MarkovChain:
     def __init__(self):
@@ -74,26 +84,58 @@ class MarkovChain:
         beginning = self.beginnings.spin()
         return self.nodes[beginning]
     
+    def has(self, word):
+        return word in self.nodes.keys()
+
+    def generateN(self, n):
+        statement = []
+        node = None
+
+        for x in range(n):
+            if not node:
+                node = self.getBeginning()
+            statement.append(node.data)
+            choice = node.forward()
+
+        return ' '.join(statement)
+
     def generate(self):
         statement = []
         ended = False
         node = self.getBeginning()
 
-        while not ended and len(statement) < self.maxGroupLength:
+        while True:
             statement.append(node.data)
-            choice = node.choose()
+            choice = node.forward()
             
             if not choice:
-                return statement
+                break
 
             node = self.nodes[choice]
 
-            if node.ends > 0:
-                endChance = (self.endFactor * node.ends) / self.totalAtoms 
-                if random.random() < endChance:
-                    ended = True
-
         return ' '.join(statement)
+
+    def expandFrom(self, word):
+        if self.has(word):
+            node = self.nodes[word]
+            statement = [node.data]
+
+            while not node.isBeginning():
+                choice = node.backward()
+                node = self.nodes[choice]
+                statement.append(node.data)
+            statement.reverse()
+
+            node = self.nodes[word]
+            
+            while not node.isEnding():
+                choice = node.forward()
+                node = self.nodes[choice]
+                statement.append(node.data)
+
+            return ' '.join(statement)
+        else:
+            return self.generate()
 
 
 if __name__ == '__main__':

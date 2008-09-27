@@ -142,9 +142,16 @@ class MarkovBot(Bot):
         self.trigger = re.compile(trigger)
 
     def generate(self):
-        return ' '.join(self.markov.generate())
+        return self.markov.generate()
 
     def handle_message(self, channel, sender, message):
+        frequencies = []
+        for word in message.split():
+            if self.markov.has(word):
+                node = self.markov.nodes[word]
+                frequencies.append([node.data, float(node.occurrences) / self.markov.totalAtoms])
+        frequencies.sort(lambda a, b: cmp(a[1], b[1]))
+
         if self.trigger.search(message) is not None:
             if has(message, "join"):
                 try:
@@ -161,7 +168,18 @@ class MarkovBot(Bot):
             elif has(message, "quit"):
                 self.quit()
 
-            statement = self.generate()
+            if len(frequencies) > 0:
+                statement = self.markov.expandFrom(frequencies[0][0])
+            else:
+                statement = self.generate()
+
             reply = sender + ": " + statement
             self.send_message(channel, reply)
+        elif len(frequencies) > 0 and frequencies[0][1] < 0.001:
+            print frequencies[0]
+
+            statement = self.markov.expandFrom(frequencies[0][0])
+            reply = sender + ": " + statement
+            self.send_message(channel, reply)
+            
 

@@ -21,9 +21,12 @@ def parseBook(string):
     return groups
     
 def markovBook(name):
-    book = open(name).read()
+    file = open(name)
+    book = file.read()
     book = parseBook(book)
+
     chain = utility.MarkovChain()
     chain.appendSource(book)
+    file.close()
 
     return chain
