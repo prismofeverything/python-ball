@@ -124,6 +124,13 @@ class Bot:
         self.member_logs[sender].write(message + '\n')
         self.member_logs[sender].flush()
 
+    def remove_member_log(self, member):
+        try:
+            self.member_logs[member].close()
+            del self.member_logs[member]
+        except:
+            pass
+
     def process(self):
         self.processing = True
         self.identify()
@@ -214,24 +221,20 @@ class Bot:
         if channel in self.channels.keys():
             self.channels[channel].member_leave(member)
         if self.logging and len(self.member_channels(member)) == 0:
-            self.member_logs[member].close()
-            del self.member_logs[member]
+            self.remove_member_log(member)
 
     def member_nick(self, member, nick):
         for key in self.channels.keys():
             self.channels[key].member_nick(member, nick)
         if self.logging:
-            self.member_logs[member].close()
-            del self.member_logs[member]
-
+            self.remove_member_log(member)
             self.member_logs[nick] = self.open_log('logs/members/', nick)
 
     def member_quit(self, member):
         for key in self.channels.keys():
             self.channels[key].member_leave(member)
         if self.logging:
-            self.member_logs[member].close()
-            del self.member_logs[member]
+            self.remove_member_log(member)
 
     def member_names(self, channel, members):
         for member in members:
