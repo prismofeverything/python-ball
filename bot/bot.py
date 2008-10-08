@@ -251,9 +251,9 @@ class MarkovBot(Bot):
     def handle_message(self, channel, sender, message):
         frequencies = []
         for word in message.split():
-            clean = self.re_non_punctuation.search(word).group(0)
-            if self.markov.has(clean):
-                node = self.markov.nodes[clean]
+            clean = self.re_non_punctuation.search(word)
+            if clean and self.markov.has(clean.group(0)):
+                node = self.markov.nodes[clean.group(0)]
                 frequencies.append([node.data, float(node.occurrences) / self.markov.totalAtoms])
         frequencies.sort(lambda a, b: cmp(a[1], b[1]))
 
