@@ -115,6 +115,7 @@ class Bot:
             self.channel_logs[channel].flush()
 
             self.member_logs[sender].write(message + '\n')
+            self.member_logs[sender].flush()
 
     def process(self):
         self.processing = True
