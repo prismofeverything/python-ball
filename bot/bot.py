@@ -70,7 +70,7 @@ class Bot:
         try:
             os.makedirs(path)
         except:
-            print "already exists"
+            pass
 
         return open(path + subject, 'a')
 
@@ -114,7 +114,11 @@ class Bot:
             self.channel_logs[channel].write(log + '\n')
             self.channel_logs[channel].flush()
 
-            self.member_logs[sender].write(message + '\n')
+            try:
+                self.member_logs[sender].write(message + '\n')
+            except KeyError:
+                self.member_join(channel, member)
+                self.member_logs[sender].write(message + '\n')
 
     def process(self):
         self.processing = True
