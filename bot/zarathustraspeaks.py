@@ -41,6 +41,8 @@ class home:
 class number:
     def GET(self, n):
         web.header('Content-Type', 'text/html')
+        if n > 33333:
+            n = 33333
         output = render_statement(Z.markov.generateN(int(n)))
 
         print(output)

@@ -115,10 +115,14 @@ class Bot:
             self.channel_logs[channel].flush()
 
             try:
-                self.member_logs[sender].write(message + '\n')
+                self.log_member(sender, message)
             except KeyError:
                 self.member_join(channel, member)
-                self.member_logs[sender].write(message + '\n')
+                self.log_member(sender, message)
+
+    def log_member(self, sender, message):
+        self.member_logs[sender].write(message + '\n')
+        self.member_logs[sender].flush()
 
     def process(self):
         self.processing = True
