@@ -148,7 +148,7 @@ class Bot:
             if len(parts) > 1:
                 if parts[1] == 'PRIVMSG':
                     channel = parts[2]
-                    if re_channel.match(channel):
+                    if self.re_channel.match(channel):
                         self.log(channel, sender, message)
                         self.handle_message(channel, sender, message)
                 elif parts[1] == 'JOIN':
