@@ -22,6 +22,11 @@ class Channel:
         if member in self.members:
             self.members.remove(member)
 
+    def member_nick(self, member, nick):
+        if member in self.members:
+            self.members.remove(member)
+            self.members.append(nick)
+
 class Bot:
     def __init__(self, nick, logging=False):
         self.host = 'irc.freenode.net'
@@ -151,6 +156,8 @@ class Bot:
                     for name in names[1:]:
                         self.parse_message(name)
                     self.member_join(channel, sender)
+                elif parts[1] == 'NICK':
+                    self.member_nick(sender, message)
                 elif parts[1] == 'PART':
                     channel = parts[2]
                     self.member_leave(channel, sender)
@@ -200,6 +207,15 @@ class Bot:
         if self.logging and len(self.member_channels(member)) == 0:
             self.member_logs[member].close()
             del self.member_logs[member]
+
+    def member_nick(self, member, nick):
+        for key in self.channels.keys():
+            self.channels[key].member_nick(member, nick)
+        if self.logging:
+            self.member_logs[member].close()
+            del self.member_logs[member]
+
+            self.member_logs[nick] = self.open_log('logs/members/', nick)
 
     def member_quit(self, member):
         for key in self.channels.keys():
