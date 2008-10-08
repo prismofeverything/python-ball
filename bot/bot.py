@@ -148,8 +148,9 @@ class Bot:
             if len(parts) > 1:
                 if parts[1] == 'PRIVMSG':
                     channel = parts[2]
-                    self.log(channel, sender, message)
-                    self.handle_message(channel, sender, message)
+                    if re_channel.match(channel):
+                        self.log(channel, sender, message)
+                        self.handle_message(channel, sender, message)
                 elif parts[1] == 'JOIN':
                     names = message.split('\r\n')
                     channel = names[0]
