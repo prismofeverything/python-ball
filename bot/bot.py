@@ -238,8 +238,9 @@ class MarkovBot(Bot):
 #             clean = self.re_non_punctuation.search(word)
 #             if clean and self.markov.has(clean.group(0)):
 #                 node = self.markov.nodes[clean.group(0)]
-            node = self.markov.nodes[word]
-            frequencies.append([node.data, float(node.occurrences) / self.markov.totalAtoms])
+            if self.markov.has(word):
+                node = self.markov.nodes[word]
+                frequencies.append([node.data, float(node.occurrences) / self.markov.totalAtoms])
         frequencies.sort(lambda a, b: cmp(a[1], b[1]))
 
         if self.trigger.search(message) is not None:
