@@ -1,7 +1,9 @@
 body {
     font: 90% "Lucida Grande",Arial;
     color: #eee;
-    background: #351155;
+	
+//    background: #351155;
+    background: #1e1123;
 }
 
 #speaks {
@@ -13,8 +15,44 @@ body {
 
 #statement {
 	font-size: 33px;
+    color: #eee;
+	background: #202220;
 	margin-left: 80px;
 	margin-right: 80px;
 	margin-top: 100px;
+	padding-top: 1px;
+	padding-left: 30px;
+	padding-bottom: 80px;
 }
 
+a:link
+{ 
+  text-decoration: none;
+  color: #eee;
+}
+a:visited
+{  
+  text-decoration: none;
+  color: #7ae;
+}
+a:visited.title
+{  
+  text-decoration: none;
+  color: #ddaa11;
+}
+a:active
+{  
+  text-decoration: none;
+}
+a:hover
+{  
+  text-decoration: underline;
+}
+
+a.title {
+  color: #eecc22;
+}
+
+a.word {
+
+}

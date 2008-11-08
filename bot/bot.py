@@ -41,7 +41,7 @@ class Bot:
         self.processing = False
         self.logging = logging
         self.channel_logs = {}
-        self.member_logs = {}
+#         self.member_logs = {}
 
         self.readbuffer = ''
         self.handlers = {}
@@ -114,22 +114,22 @@ class Bot:
             self.channel_logs[channel].write(log + '\n')
             self.channel_logs[channel].flush()
 
-            try:
-                self.log_member(sender, message)
-            except KeyError:
-                self.member_join(channel, member)
-                self.log_member(sender, message)
+#             try:
+#                 self.log_member(sender, message)
+#             except KeyError:
+#                 self.member_join(channel, member)
+#                 self.log_member(sender, message)
 
-    def log_member(self, sender, message):
-        self.member_logs[sender].write(message + '\n')
-        self.member_logs[sender].flush()
+#     def log_member(self, sender, message):
+#         self.member_logs[sender].write(message + '\n')
+#         self.member_logs[sender].flush()
 
-    def remove_member_log(self, member):
-        try:
-            self.member_logs[member].close()
-            del self.member_logs[member]
-        except:
-            pass
+#     def remove_member_log(self, member):
+#         try:
+#             self.member_logs[member].close()
+#             del self.member_logs[member]
+#         except:
+#             pass
 
     def process(self):
         self.processing = True
@@ -213,28 +213,28 @@ class Bot:
             return [message]
 
     def member_join(self, channel, member):
-        if self.logging:
-            self.member_logs[member] = self.open_log('logs/members/', member)
+#         if self.logging:
+#             self.member_logs[member] = self.open_log('logs/members/', member)
         self.channels[channel].member_join(member)
 
     def member_leave(self, channel, member):
         if channel in self.channels.keys():
             self.channels[channel].member_leave(member)
-        if self.logging and len(self.member_channels(member)) == 0:
-            self.remove_member_log(member)
+#         if self.logging and len(self.member_channels(member)) == 0:
+#             self.remove_member_log(member)
 
     def member_nick(self, member, nick):
         for key in self.channels.keys():
             self.channels[key].member_nick(member, nick)
-        if self.logging:
-            self.remove_member_log(member)
-            self.member_logs[nick] = self.open_log('logs/members/', nick)
+#         if self.logging:
+#             self.remove_member_log(member)
+#             self.member_logs[nick] = self.open_log('logs/members/', nick)
 
     def member_quit(self, member):
         for key in self.channels.keys():
             self.channels[key].member_leave(member)
-        if self.logging:
-            self.remove_member_log(member)
+#         if self.logging:
+#             self.remove_member_log(member)
 
     def member_names(self, channel, members):
         for member in members:

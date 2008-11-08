@@ -8,7 +8,7 @@ render = web.template.render('templates/',cache=False)
 urls = (
     '/?', 'home',
     '/(\d+)/?', 'number',
-    '/(\w+)/?', 'word'
+    '/([^/]*)/?', 'word'
 )
 
 def render_statement(statement):
@@ -23,7 +23,7 @@ def render_statement(statement):
   </head>
   <body>
     <div id="speaks">
-      <p>ZARATHUSTRA SAYS:</p>
+      <p><a href="/" class="title">ZARATHUSTRA SAYS:</a></p>
     </div>
     <div id="statement">
       <p>""" + statement + """</p>
@@ -31,10 +31,20 @@ def render_statement(statement):
   </body>
 </html>"""
 
+
+def anchorize_word(word):
+    return '<a href="/' + word + '/" class="word">' + word + '</a>'
+
+def anchorize_statement(statement):
+    words = statement.split(' ')
+    anchors = [anchorize_word(word) for word in words]
+
+    return ' '.join(anchors)
+
 class home:
     def GET(self):
         web.header('Content-Type', 'text/html')
-        output = render_statement(Z.generate())
+        output = render_statement(anchorize_statement(Z.generate()))
 
         print(output)
 
@@ -43,7 +53,8 @@ class number:
         web.header('Content-Type', 'text/html')
         if n > 33333:
             n = 33333
-        output = render_statement(Z.markov.generateN(int(n)))
+        statement = Z.markov.generateN(int(n))
+        output = render_statement(anchorize_statement(statement))
 
         print(output)
 
@@ -56,7 +67,7 @@ class word:
         else:
             statement = 'I do not know ' + word + '.'
 
-        output = render_statement(statement)
+        output = render_statement(anchorize_statement(statement))
         print(output)
     
 
