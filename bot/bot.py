@@ -144,25 +144,25 @@ class Bot:
 
             if len(parts) > 1:
                 if parts[1] == 'PRIVMSG':
-                    channel = parts[2]
+                    channel = parts[2].lower()
                     if self.re_channel.match(channel):
                         self.log(channel, sender, message)
                         self.handle_message(channel, sender, message)
                 elif parts[1] == 'JOIN':
                     names = message.split('\r\n')
-                    channel = names[0]
+                    channel = names[0].lower()
                     for name in names[1:]:
                         self.parse_message(name)
                     self.member_join(channel, sender)
                 elif parts[1] == 'NICK':
                     self.member_nick(sender, message)
                 elif parts[1] == 'PART':
-                    channel = parts[2]
+                    channel = parts[2].lower()
                     self.member_leave(channel, sender)
                 elif parts[1] == 'QUIT':
                     self.member_quit(sender)
                 elif len(parts) > 3 and parts[3] == '=':
-                    channel = parts[4]
+                    channel = parts[4].lower()
                     members = message.split(' ')[:-1]
                     
                     self.member_names(channel, members)
