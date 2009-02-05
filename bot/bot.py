@@ -259,10 +259,11 @@ class MarkovBot(Bot):
                 frequencies.append([node.data, float(node.occurrences) / self.markov.totalAtoms])
         frequencies.sort(lambda a, b: cmp(a[1], b[1]))
 
-        least_frequent = frequencies[0][0]
-        if least_frequent == self.least_frequent:
-            sending = False
-        self.least_frequent = least_frequent
+        if len(frequencies) > 0:
+            least_frequent = frequencies[0][0]
+            if least_frequent == self.least_frequent:
+                sending = False
+            self.least_frequent = least_frequent
 
         if self.re_trigger.search(message) is not None:
             if len(frequencies) > 0:
