@@ -305,7 +305,7 @@ class ChannelBots:
         self.re_message = re.compile('^<([^>]+)>(.*)$')
 
         self.nicks = self.parse_source(self.source)
-        self.zarathustra = bot.MarkovBot.__init__(self, 'Zarathustrabot', 'zarathustra.txt', 'Z', True, True)
+        self.zarathustra = MarkovBot('Zarathustrabot', 'zarathustra.txt', 'Z', True, True)
         self.bots = [self.zarathustra] + [MarkovBot(nick+'bot', '\n'.join(self.nicks[nick]), nick) for nick in self.nicks.keys() if len(self.nicks[nick]) > 30]
 
     def parse_source(self, source):
@@ -330,8 +330,8 @@ class ChannelBots:
         self.process()
 
     def process(self):
-        for bot in self.bots:
-            bot.process()
+        while True:
+            time.sleep(100)
 
 
 if __name__ == "__main__":
