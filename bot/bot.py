@@ -245,6 +245,7 @@ class MarkovBot(Bot):
         self.re_trigger = re.compile(trigger)
         self.stopped = False
         self.least_frequent = ''
+        self.least_two = ['', '']
 
     def generate(self):
         return self.markov.generate()
@@ -260,10 +261,13 @@ class MarkovBot(Bot):
         frequencies.sort(lambda a, b: cmp(a[1], b[1]))
 
         if len(frequencies) > 0:
-            least_frequent = frequencies[0][0]
-            if least_frequent == self.least_frequent:
+            least = frequencies[0][0]
+
+            if least in self.least_two:
                 sending = False
-            self.least_frequent = least_frequent
+            self.least_frequent = least
+            self.least_two.append(least)
+            self.least_two = self.least_two[1:]
 
         if self.re_trigger.search(message) is not None:
             if len(frequencies) > 0:
