@@ -8,7 +8,7 @@ import bot
 
 class Zarathustrabot(bot.MarkovBot):
     def __init__(self):
-        bot.MarkovBot.__init__(self, 'Zarathustrabot', 'zarathustra.txt', 'Z', True, True)
+        bot.MarkovBot.__init__(self, 'Zarathustrabot', 'bot/zarathustra.txt', 'Z', True, True)
 
 if __name__ == "__main__":
     z = Zarathustrabot()
