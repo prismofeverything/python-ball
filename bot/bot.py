@@ -244,18 +244,25 @@ class MarkovBot(Bot):
         self.trigger = trigger
         self.re_trigger = re.compile(trigger)
         self.stopped = False
+        self.least_frequent = ''
 
     def generate(self):
         return self.markov.generate()
 
     def handle_message(self, channel, sender, message):
         frequencies = []
+        sending = True
+
         for word in message.split():
-            if self.markov.has(word):
-                if not word == self.trigger:
-                    node = self.markov.nodes[word]
-                    frequencies.append([node.data, float(node.occurrences) / self.markov.totalAtoms])
+            if self.markov.has(word) and not word == self.trigger and not word == self.least_frequent:
+                node = self.markov.nodes[word]
+                frequencies.append([node.data, float(node.occurrences) / self.markov.totalAtoms])
         frequencies.sort(lambda a, b: cmp(a[1], b[1]))
+
+        least_frequent = frequencies[0][0]
+        if least_frequent == self.least_frequent:
+            sending = False
+        self.least_frequent = least_frequent
 
         if self.re_trigger.search(message) is not None:
             if len(frequencies) > 0:
@@ -264,7 +271,6 @@ class MarkovBot(Bot):
                 statement = self.generate()
 
             reply = sender + ": " + statement
-            sending = True
 
             if has(message, "join"):
                 try:
