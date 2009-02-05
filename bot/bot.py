@@ -235,7 +235,8 @@ class MarkovBot(Bot):
         Bot.__init__(self, nick, logging)
 
         self.markov = text.markovText(source)
-        self.trigger = re.compile(trigger)
+        self.trigger = trigger
+        self.re_trigger = re.compile(trigger)
         self.stopped = False
 
     def generate(self):
@@ -245,11 +246,12 @@ class MarkovBot(Bot):
         frequencies = []
         for word in message.split():
             if self.markov.has(word):
-                node = self.markov.nodes[word]
-                frequencies.append([node.data, float(node.occurrences) / self.markov.totalAtoms])
+                if not word == self.trigger:
+                    node = self.markov.nodes[word]
+                    frequencies.append([node.data, float(node.occurrences) / self.markov.totalAtoms])
         frequencies.sort(lambda a, b: cmp(a[1], b[1]))
 
-        if not self.stopped and self.trigger.search(message) is not None:
+        if not self.stopped and self.re_trigger.search(message) is not None:
             if len(frequencies) > 0:
                 statement = self.markov.expandFrom(frequencies[0][0])
             else:
@@ -319,7 +321,7 @@ class ChannelBots:
     def connect(self):
         for bot in self.bots:
             bot.start()
-            time.sleep(100)
+            time.sleep(40)
 
         self.process()
 
