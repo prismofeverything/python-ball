@@ -257,14 +257,14 @@ class MarkovBot(Bot):
                     frequencies.append([node.data, float(node.occurrences) / self.markov.totalAtoms])
         frequencies.sort(lambda a, b: cmp(a[1], b[1]))
 
-        if not self.stopped and self.re_trigger.search(message) is not None:
+        if self.re_trigger.search(message) is not None:
             if len(frequencies) > 0:
                 statement = self.markov.expandFrom(frequencies[0][0])
             else:
                 statement = self.generate()
 
             reply = sender + ": " + statement
-            self.send_message(channel, reply)
+            sending = True
 
             if has(message, "join"):
                 try:
@@ -280,7 +280,8 @@ class MarkovBot(Bot):
                     pass
             elif has(message, "stop"):
                 self.stopped = True
-            elif has(message, "start"):
+                self.sending = False
+            elif has(message, "start") or has(message, "hi"):
                 self.stopped = False
             elif has(message, "zap"):
                 try:
@@ -296,7 +297,12 @@ class MarkovBot(Bot):
                     pass
                 self.send("TOPIC " + topic_channel + " :" + self.markov.generateN(11))
             elif has(message, "quit"):
+                sending = False
                 self.quit()
+
+            if sending and not self.stopped:
+                self.send_message(channel, reply)
+
             
 
 class ChannelBots:
