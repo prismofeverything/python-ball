@@ -4,6 +4,8 @@ import socket
 import string
 import re
 import math
+import time
+import threading
 
 import text
 
@@ -27,7 +29,7 @@ class Channel:
             self.members.remove(member)
             self.members.append(nick)
 
-class Bot:
+class Bot(threading.Thread):
     def __init__(self, nick, logging=False):
         self.host = 'irc.freenode.net'
         self.port = 6667
@@ -48,6 +50,8 @@ class Bot:
         self.re_sender = re.compile('^:(\w+)(![^ ]*)?')
         self.re_channel = re.compile("#[^ \r\n]+")
         self.re_non_punctuation = re.compile("[^.,!?]+")
+
+        threading.Thread.__init__(self)
 
     def send(self, message):
         self.s.send(message + '\n')
@@ -221,13 +225,18 @@ class Bot:
 
         return channels
 
+    def run(self):
+        self.connect()
+        self.process()
+
 
 class MarkovBot(Bot):
     def __init__(self, nick, source, trigger, logging=False):
         Bot.__init__(self, nick, logging)
 
-        self.markov = text.markovBook(source)
+        self.markov = text.markovText(source)
         self.trigger = re.compile(trigger)
+        self.stopped = False
 
     def generate(self):
         return self.markov.generate()
@@ -240,7 +249,7 @@ class MarkovBot(Bot):
                 frequencies.append([node.data, float(node.occurrences) / self.markov.totalAtoms])
         frequencies.sort(lambda a, b: cmp(a[1], b[1]))
 
-        if self.trigger.search(message) is not None:
+        if not self.stopped and self.trigger.search(message) is not None:
             if len(frequencies) > 0:
                 statement = self.markov.expandFrom(frequencies[0][0])
             else:
@@ -261,6 +270,10 @@ class MarkovBot(Bot):
                     self.leave(old_channel)
                 except:
                     pass
+            elif has(message, "stop"):
+                self.stopped = True
+            elif has(message, "start"):
+                self.stopped = False
             elif has(message, "zap"):
                 try:
                     tell_channel = self.re_channel.search(message).group(0)
@@ -278,3 +291,43 @@ class MarkovBot(Bot):
                 self.quit()
             
 
+class ChannelBots:
+    def __init__(self, filename):
+        """ accepts a file of the format: <nick> message """
+        self.filename = filename
+        self.source = open(self.filename, 'r').read()
+
+        self.re_message = re.compile('^<([^>]+)>(.*)$')
+
+        self.nicks = self.parse_source(self.source)
+        self.bots = [MarkovBot(nick+'bot', self.nicks[nick], nick) for nick in self.nicks.keys()]
+
+    def parse_source(self, source):
+        nicks = {}
+
+        lines = source.split('\n')
+        for line in lines:
+            search = self.re_message.search(line)
+            if search:
+                nick, message = search.groups()
+                if not nicks.has_key(nick):
+                    nicks[nick] = ''
+                nicks[nick] += message + '\n'
+
+        return nicks
+
+    def connect(self):
+        for bot in self.bots:
+            bot.start()
+            time.sleep(100)
+
+        self.process()
+
+    def process(self):
+        for bot in self.bots:
+            bot.process()
+
+
+if __name__ == "__main__":
+    bots = ChannelBots('bot/logs/channels/instrument')
+    bots.connect()

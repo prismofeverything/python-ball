@@ -20,6 +20,14 @@ def parseBook(string):
 
     return groups
     
+def markovText(text):
+    conversation = parseConversation(text)
+
+    chain = utility.MarkovChain()
+    chain.appendSource(conversation)
+
+    return chain
+
 def markovBook(name):
     file = open(name)
     book = file.read()
