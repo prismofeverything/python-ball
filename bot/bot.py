@@ -326,10 +326,9 @@ class ChannelBots:
 
         self.nicks = self.parse_source(self.source)
         bot_names = ['Kim_', 'double-m', 'cscotta', 'WessW', 'mking', 'joshbradley', 'Kafka', 'patchwork', 'mokmok']
-        self.bots = [MarkovBot(nick+'bot', '\n'.join(self.nicks[nick]), nick) for nick in bot_names]
 
-#         self.zarathustra = MarkovBot('Zarathustrabot', 'bot/zarathustra.txt', 'Z', True, True)
-#         self.bots = [self.zarathustra] + [MarkovBot(nick+'bot', '\n'.join(self.nicks[nick]), nick) for nick in self.nicks.keys() if len(self.nicks[nick]) > 30]
+        self.zarathustra = MarkovBot('Zarathustrabot', 'bot/zarathustra.txt', 'Z', True, True)
+        self.bots = [self.zarathustra] + [MarkovBot(nick+'bot', '\n'.join(self.nicks[nick]), nick) for nick in bot_names]
 
     def parse_source(self, source):
         nicks = {}
