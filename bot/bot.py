@@ -111,9 +111,10 @@ class Bot(threading.Thread):
             log = "* " + sender + " " + message[7:]
         else:
             log = '<' + sender + '> ' +  message
-        print log
 
         if self.logging:
+            print log
+
             self.channel_logs[channel].write(log + '\n')
             self.channel_logs[channel].flush()
 
@@ -123,8 +124,6 @@ class Bot(threading.Thread):
 
         while self.processing:
             line = self.s.recv(500).rstrip()
-
-            print line
 
             if len(self.channels) == 0:
                 self.join("#dog")
@@ -231,10 +230,14 @@ class Bot(threading.Thread):
 
 
 class MarkovBot(Bot):
-    def __init__(self, nick, source, trigger, logging=False):
+    def __init__(self, nick, source, trigger, book=False, logging=False):
         Bot.__init__(self, nick, logging)
 
-        self.markov = text.markovText(source)
+        if book:
+            self.markov = text.markovBook(source)
+        else:
+            self.markov = text.markovText(source)
+
         self.trigger = trigger
         self.re_trigger = re.compile(trigger)
         self.stopped = False
@@ -302,7 +305,8 @@ class ChannelBots:
         self.re_message = re.compile('^<([^>]+)>(.*)$')
 
         self.nicks = self.parse_source(self.source)
-        self.bots = [MarkovBot(nick+'bot', '\n'.join(self.nicks[nick]), nick) for nick in self.nicks.keys() if len(self.nicks[nick]) > 30]
+        self.zarathustra = bot.MarkovBot.__init__(self, 'Zarathustrabot', 'zarathustra.txt', 'Z', True, True)
+        self.bots = [self.zarathustra] + [MarkovBot(nick+'bot', '\n'.join(self.nicks[nick]), nick) for nick in self.nicks.keys() if len(self.nicks[nick]) > 30]
 
     def parse_source(self, source):
         nicks = {}
