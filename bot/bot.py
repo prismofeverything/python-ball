@@ -302,7 +302,7 @@ class ChannelBots:
         self.re_message = re.compile('^<([^>]+)>(.*)$')
 
         self.nicks = self.parse_source(self.source)
-        self.bots = [MarkovBot(nick+'bot', self.nicks[nick], nick) for nick in self.nicks.keys()]
+        self.bots = [MarkovBot(nick+'bot', '\n'.join(self.nicks[nick]), nick) for nick in self.nicks.keys() if len(self.nicks[nick]) > 30]
 
     def parse_source(self, source):
         nicks = {}
@@ -313,8 +313,8 @@ class ChannelBots:
             if search:
                 nick, message = search.groups()
                 if not nicks.has_key(nick):
-                    nicks[nick] = ''
-                nicks[nick] += message + '\n'
+                    nicks[nick] = []
+                nicks[nick].append(message)
 
         return nicks
 
