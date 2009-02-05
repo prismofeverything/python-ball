@@ -131,6 +131,9 @@ class Bot(threading.Thread):
             self.parse_message(line)
 
     def parse_message(self, line):
+        if self.logging:
+            print line
+
         if line[:4] == 'PING':
             parts = line.split()
             if len(parts) > 0 and parts[0] == 'PING':
@@ -305,8 +308,9 @@ class ChannelBots:
         self.re_message = re.compile('^<([^>]+)>(.*)$')
 
         self.nicks = self.parse_source(self.source)
-        self.zarathustra = MarkovBot('Zarathustrabot', 'bot/zarathustra.txt', 'Z', True, True)
-        self.bots = [self.zarathustra] + [MarkovBot(nick+'bot', '\n'.join(self.nicks[nick]), nick) for nick in self.nicks.keys() if len(self.nicks[nick]) > 30]
+        self.bots = [MarkovBot(nick+'bot', '\n'.join(self.nicks[nick]), nick) for nick in self.nicks.keys() if len(self.nicks[nick]) > 30]
+#         self.zarathustra = MarkovBot('Zarathustrabot', 'bot/zarathustra.txt', 'Z', True, True)
+#         self.bots = [self.zarathustra] + [MarkovBot(nick+'bot', '\n'.join(self.nicks[nick]), nick) for nick in self.nicks.keys() if len(self.nicks[nick]) > 30]
 
     def parse_source(self, source):
         nicks = {}
