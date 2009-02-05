@@ -308,8 +308,7 @@ class ChannelBots:
         self.re_message = re.compile('^<([^>]+)>(.*)$')
 
         self.nicks = self.parse_source(self.source)
-        self.bots = [MarkovBot(nick+'bot', '\n'.join(self.nicks[nick]), nick) for nick in self.nicks.keys() if len(self.nicks[nick]) > 30]
-        self.bots[0].logging = True
+        self.bots = [MarkovBot(nick+'bot', '\n'.join(self.nicks[nick]), nick, False, True) for nick in self.nicks.keys() if len(self.nicks[nick]) > 30]
 
 #         self.zarathustra = MarkovBot('Zarathustrabot', 'bot/zarathustra.txt', 'Z', True, True)
 #         self.bots = [self.zarathustra] + [MarkovBot(nick+'bot', '\n'.join(self.nicks[nick]), nick) for nick in self.nicks.keys() if len(self.nicks[nick]) > 30]
