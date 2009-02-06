@@ -79,7 +79,7 @@ class Bot(threading.Thread):
 
     def join(self, channel):
         if self.logging:
-            self.channel_logs[channel] = self.open_log('logs/channels/', channel[1:])
+            self.channel_logs[channel] = self.open_log('bot/logs/channels/', channel[1:])
         new_channel = Channel(channel)
         self.channels[channel] = new_channel
 
