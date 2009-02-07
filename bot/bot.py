@@ -228,8 +228,11 @@ class Bot(threading.Thread):
         return channels
 
     def run(self):
-        self.connect()
-        self.process()
+        try:
+            self.connect()
+            self.process()
+        except e:
+            print self.nick + " FAILED!" + str(e)
 
 
 class MarkovBot(Bot):
@@ -289,25 +292,27 @@ class MarkovBot(Bot):
                     self.leave(old_channel)
                 except:
                     pass
-            elif has(message, "stop"):
+
+            if has(message, "stop"):
                 self.stopped = True
-                self.sending = False
-            elif has(message, "start") or has(message, "hi"):
+                sending = False
+            if has(message, "start") or has(message, "hi"):
                 self.stopped = False
-            elif has(message, "zap"):
+
+            if has(message, "zap"):
                 try:
                     tell_channel = self.re_channel.search(message).group(0)
                     self.send_message(tell_channel, statement)
                 except:
                     pass
-            elif has(message, "topic"):
+            if has(message, "topic"):
                 topic_channel = channel
                 try:
                     topic_channel = self.re_channel.search(message).group(0)
                 except:
                     pass
                 self.send("TOPIC " + topic_channel + " :" + self.markov.generateN(11))
-            elif has(message, "quit"):
+            if has(message, "quit"):
                 sending = False
                 self.quit()
 
